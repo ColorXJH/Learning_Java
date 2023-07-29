@@ -8,4 +8,5 @@
     需要java com.master.chapter01.Helloworld 这样执行才行
 ## 3 文档注释
     文档注释/** */ 可以被javadoc 命令所生成获取  javadoc -d 文件名 -author -version xxx.java
+    [a,b] :（int）(Math.random()*(b-a+1)+a)
     

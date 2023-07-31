@@ -9,6 +9,10 @@ package com.master.chapter01;
  */
 public class HelloWorld {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        int xx=0,yy=1,zz=3;
+        int xb=--xx- --yy- --yy;//-1 - 0- (-1)=
+        int max=(xx>yy?xx:yy)>zz?(xx>yy?xx:yy):zz;
+        System.out.println(xb);
+        System.out.println(max);
     }
 }

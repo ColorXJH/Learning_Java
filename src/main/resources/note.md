@@ -61,3 +61,13 @@
     对象的多态性，父类引用指向子类对象
     多态的使用：虚拟方法调用：编译器以左边为主，执行期实际执行右边子类重写的方法
     多态性不适用于属性
+### 14 toString()
+    String Date File 包装类都重写了Object的toString()方法
+    默认getClass()+"@"+Integer.toHexString(hashCode())
+### 15 equals
+    基本数据类型比较实用== 比较值的大小是否相等，不需要类型一致，可以存在类型提升
+    应用数据类型比较默认使用==,自己重写该Object类的equals()方法，比较他们的数据大小
+    注意在判断是否是同一个类时，一般使用 getClass()==0.getClass()会比较安全
+    不建议使用a instanceof ClassB 这样会存在父子类型，如果子类重写了了equals()方法（直接返回false）
+    会导致父类equals子类为true,子类equals父类为false,而且夸类的比较返回true也不合适
+    简直直接使用idea默认生成的equals方法

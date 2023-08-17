@@ -18,6 +18,7 @@ public class InnerClassTest {
         //非静态内部类
         Outer outer=new Outer();
         Outer.Inner inner=outer.new Inner();
+        Outer.Inner is=new Outer().new Inner();
         //静态内部类
         Outer.InnerClass innerStaticClass=new Outer.InnerClass(){
             @Override
@@ -95,11 +96,12 @@ class Outer{
 
     protected final class Inner{
         private String name;
-        public void display(){
+        public void display(String name){
             show();
             //Outer.this  外部类的方法
             Outer.this.display();
             System.out.println(name);
+            System.out.println(this.name);
             System.out.println(Outer.this.name);
         }
         public void show(){
@@ -115,9 +117,13 @@ class Outer{
 
     public void show(){
         //局部内部类(方法内 代码块内，构造器内)
-
+        int namess=10;
         class Test{
-
+            public void showsss(){
+                //在局部内部类的方法中，如果要使用外部类的变量，则这个变量需要时final的，java8 之后省略了这个final（8之前需要显示声明final）,但是她依然是final，只是没有写出来，修改它的值依然会报错
+                //why？对于作用域而言是可以使用外部的变量，但是作为类而言，他们是两个字节码文件，脱离了一个文件体系，导致只能给你用不能改
+                System.out.println(namess);
+            }
         }
     }
     //代码块

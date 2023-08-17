@@ -97,3 +97,5 @@ class MyFlay extends Action implements Flyable,Flyable2{
 
     }
 }
+//abstract 不能用来修饰静态方法，因为静态方法不能被重写，不能修饰属性 构造器，同时不能修饰私有方法，因为私有方法不能被重写，
+//也不能修饰final方法，final类

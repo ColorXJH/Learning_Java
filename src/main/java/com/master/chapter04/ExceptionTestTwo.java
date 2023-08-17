@@ -57,3 +57,23 @@ class B extends A{
     public void show(int age) throws FileNotFoundException {
     }
 }
+
+
+class C {
+    public static void main(String[] args) {
+        try {
+            show();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void show(){
+        play();
+    }
+    //运行时异常也可以不捕获 不声明
+
+    public static void play(){
+        throw new RuntimeException("hahaha");
+    }
+}

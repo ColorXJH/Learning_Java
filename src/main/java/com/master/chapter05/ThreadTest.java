@@ -8,6 +8,15 @@ package com.master.chapter05;
  */
 public class ThreadTest {
     public static void main(String[] args) {
+        MyThread myThread=new MyThread();
+        myThread.start();
+        System.out.println("main start---");
+    }
+}
 
+class MyThread extends Thread{
+    @Override
+    public void run() {
+        System.out.println("thread start---");
     }
 }

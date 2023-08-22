@@ -47,7 +47,7 @@ class MyThreads extends Thread{
 
 class MyRun implements Runnable{
     //待解决的线程安全问题
-
+    //无需static 多个线程共享一个
     private int ticket1=100;
     @Override
     public void run() {

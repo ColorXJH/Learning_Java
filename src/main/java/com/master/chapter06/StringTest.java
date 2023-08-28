@@ -1,5 +1,8 @@
 package com.master.chapter06;
 
+import java.nio.charset.Charset;
+import java.util.Arrays;
+
 /**
  * @author ColorXJH
  * @version 1.0
@@ -48,9 +51,22 @@ public class StringTest {
         //如果常量池中不存在该字符串，则将该字符串添加到常量池中，并返回常量池中的引用。
         String s11=s9.intern();
         System.out.println(s11==s6);
+        byte[] bytes = "中国".getBytes(Charset.forName("GBK"));
+        System.out.println(">>>>>>>------");
+        System.out.println(Arrays.toString(bytes));
+        String sss=new String(bytes);
+        System.out.println(sss);
     }
 }
 /**
  * String s=new String("abc");
  * 在内存中创建了两个对象：一个是堆空间中的new结构 另一个是char[]对应的常量池中的数据“abc”
+ */
+
+
+/**
+ * String类的各种方法
+ * String类与其他类型的转换方法
+ * String类与char[]数组之间的转换
+ * String类与byte[]数组之间的转换 编码与解码 字符集
  */

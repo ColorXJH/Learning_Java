@@ -42,8 +42,8 @@ public class StringTestArgs {
         System.out.println("str hashcode:"+testArgs.str.hashCode());
         System.out.println("ch hashcode:"+testArgs.ch.hashCode());
 
-        System.out.println(testArgs.str);//good
-        System.out.println(testArgs.ch);//best
+        System.out.println(testArgs.str); //good
+        System.out.println(testArgs.ch); //best怎么感觉我们和苏领导用的不是一个部门的项目 一个是营销部的 一个是数字化部的
     }
 }
 /**

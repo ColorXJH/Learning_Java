@@ -11,5 +11,9 @@ public class BeforeJDK8DateTime {
     public static void main(String[] args) {
         //System类的时间戳
         System.out.println(System.currentTimeMillis());
+        /**
+         * Date的未过时的方法
+         *
+         */
     }
 }

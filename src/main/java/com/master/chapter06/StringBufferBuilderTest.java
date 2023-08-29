@@ -21,5 +21,6 @@ public class StringBufferBuilderTest {
  * 只要不是多线程操作共享数据 就推荐StringBuilder
  * 三者底层都是char[]数组
  * 扩容机制
- * 常用方法
+ * 常用方法  增删改查 插入 长度 遍历
+ * append(xxx) delete(int start,int end) setCharAt(int n)/replace(int start ,int end, String str) charAt(int n) insert(int offset,xxx) length()  for+ charAt
  */

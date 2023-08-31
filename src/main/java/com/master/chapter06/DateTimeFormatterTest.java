@@ -1,6 +1,7 @@
 package com.master.chapter06;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.TemporalAccessor;
@@ -32,7 +33,10 @@ public class DateTimeFormatterTest {
         //自定义的格式化
         DateTimeFormatter dateTimeFormatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
         String format2 = dateTimeFormatter1.format(now);
+        LocalDateTime parse1 = LocalDateTime.parse("2023-08-31 16:24:34", dateTimeFormatter1);
+        long l = parse1.toEpochSecond(ZoneOffset.UTC);
         System.out.println(format2);
+        System.out.println(l);
     }
 
 }

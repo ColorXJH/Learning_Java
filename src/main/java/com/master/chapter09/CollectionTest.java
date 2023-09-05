@@ -39,11 +39,29 @@ public class CollectionTest {
         List<Integer> integers1 = Arrays.asList(new Integer[]{123, 456});
         //返回Iterator接口的实例，用于遍历集合元素
         //集合都继承Iterable接口，该接口中方法返回迭代器对象，more游标在第一个元素之前
+        //每当调用一个iterator()方法，都会返回一个迭代器对象，是一个全新的对象
         Iterator iterator = collection.iterator();
+        //不建议这样写，建议下方另外一个方法写
+        for (int i = 0; i < collection.size(); i++) {
+            System.out.println(iterator.next());
+        }
+        //建议这样 iterator初始指针只想第一个元素上方
         while (iterator.hasNext()){
+            //next()方法调用之后 指针下移，将下移后集合位置上的元素返回
             Object next = iterator.next();
         }
-
+        //如何移除元素 重新创建迭代器去遍历 原有的迭代器已经到末尾了
+        Iterator iterator2 = collection.iterator();
+        while (iterator2.hasNext()){
+            Object next = iterator2.next();
+            if("123".equals(next)){
+                iterator2.remove();
+            }
+        }
+        /**
+         * 注意：Iterator可以删除集合中的元素，但是是遍历过程中通过迭代器对象的remove方法，不是集合对象的remove方法
+         * 如果还未调用next()或在上一次调用next()方法之后已经调用了remove方法，再调用remove都会报错IllegalStateException
+         */
 
     }
 }

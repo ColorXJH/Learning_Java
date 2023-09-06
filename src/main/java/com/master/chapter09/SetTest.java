@@ -13,7 +13,8 @@ public class SetTest {
         SetTest setTest=new SetTest();
         //setTest.test1();
         //setTest.test2();
-        setTest.test3();
+        //setTest.test3();
+        setTest.test4();
 
     }
     public void test1(){
@@ -52,6 +53,26 @@ public class SetTest {
         while (iterator.hasNext()){
             System.out.println(iterator.next());
         }
+    }
+    //很经典的一道题 set先按照hashcode添加，移除的时候重新计算hashcode发现已经更改了，没移除掉，再新增的时候属于新的hashcode点位，再次新增是原来的点位但是内容不一致，所以四个都能加上
+    //JDK 1.7中的HashSet使用数组+链表的数据结构，而JDK 1.8中的HashSet使用数组+链表/红黑树的数据结构。
+    //具体来说，JDK 1.8中的HashSet内部使用了HashMap来实现。
+    //在JDK 1.8之前，HashSet使用一个Entry数组来存储元素，每个Entry是一个链表节点，用于解决哈希冲突。当链表长度过长时，会导致查找效率下降。
+    //而在JDK 1.8中，当链表长度超过一定阈值（默认为8）时，链表会转换为红黑树，以提高查找效率。这样，在哈希冲突较多的情况下，HashSet的性能得到了显著的提升
+    public void test4(){
+        Set set=new HashSet();
+        Person4 p1=new Person4(1001,"AA");
+        Person4 p2=new Person4(1002,"BB");
+        set.add(p1);
+        set.add(p2);
+        System.out.println(set);
+        p1.name="cc";
+        set.remove(p1);
+        System.out.println(set);
+        set.add(new Person4(1001,"cc"));
+        System.out.println(set);
+        set.add(new Person4(1001,"AA"));
+        System.out.println(set);
     }
 }
 /**
@@ -192,3 +213,41 @@ class Person2{
  * 集合在java8中增强了 Collection接口中添加了默认方法forEach,接受一个Cosumer接口，使用lambda书写
  *
  */
+
+class Person4{
+    int id;
+    String name;
+    public Person4(int id,String name){
+        this.id=id;
+        this.name=name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person4 person4 = (Person4) o;
+        return id == person4.id && Objects.equals(name, person4.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
+    @Override
+    public String toString() {
+        return "Person4{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+}

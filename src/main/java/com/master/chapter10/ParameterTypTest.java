@@ -109,7 +109,7 @@ class Order<T>{
 }
 
 //此时继承了父类，父类制定了泛型类型，子类不再需要指定泛型
-class SubOrder extends Order<Integer>{
+class SubOrder extends Order<Integer>{//SubOrder不是泛型类
 
 }
 //子类不保留父类的泛型，相当于类型擦除//class SubsOrder extends Order<Object>
@@ -117,7 +117,7 @@ class SubsOrder extends Order{
 
 }
 //此时子类必须声明泛型类，因为父类无法去定泛型类型
-class SubOrder1<T> extends Order<T>{
+class SubOrder1<T> extends Order<T>{//SubOrder1<T>仍然是泛型类
 
 }
 
@@ -137,6 +137,14 @@ class TETST1{
     public <E> E getValue(){
         return null;
     }
+    //泛型方法可以声明为静态的，因为泛型参数在调用方法时是确定的，并非在实例化类时候确定
+    public static<E> List<E>TEST2(E[] arr){
+        ArrayList<E>LIST=new ArrayList<>();
+        for(E e:arr){
+            LIST.add(e);
+        }
+        return LIST;
+    }
 }
 /**
  * 泛型不同的引用不能相互赋值
@@ -153,7 +161,7 @@ class TETST1{
 
 /**
  * 泛型的通配符
- * ? 通配符 任意类型
+ * ? 通配符 任意类型 List<?> 作为List<String> List<Object>的父类使用声明
  * <? extends Number> extends 上限 (无穷小, Number] 只允许泛型为Number类及Number类的子类调用
  * <? super Number> super 下限 [Number,无穷大) 只允许泛型为Number类及Number类的父类调用
  * <? extends Comparable> 只允许泛型为实现Comparable接口的实现类的引用调用

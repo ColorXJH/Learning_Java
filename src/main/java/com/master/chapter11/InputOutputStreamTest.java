@@ -15,7 +15,9 @@ public class InputOutputStreamTest {
         //test.fileReader();
         //test.fileReaderOverLoad();
         //test.fileWriter();
-        test.fileReaderAndWriter();
+        //test.fileReaderAndWriter();
+        //复制图片
+        test.testInputStreamOutputStream();
     }
     public void fileReader(){
         File file=new File("test.txt");//相对路径
@@ -122,7 +124,35 @@ public class InputOutputStreamTest {
     }
     //图片的复制只能使用字节流
     public void testInputStreamOutputStream(){
+        File readFile=new File("001.jpg");
+        File writeFile=new File("001_bak.jpg");
+        FileInputStream inputStream=null;
+        FileOutputStream outputStream=null;
+        try {
+            inputStream=new FileInputStream(readFile);
+            outputStream=new FileOutputStream(writeFile);
+            int readNum=0;
+            byte[]bytes=new byte[10];
+            while ((readNum=inputStream.read(bytes))!=-1){
+                outputStream.write(bytes,0,readNum);
+            }
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(inputStream!=null)
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if(outputStream!=null)
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 

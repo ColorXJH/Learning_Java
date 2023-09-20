@@ -1,5 +1,8 @@
 package com.master.chapter13;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * @author ColorXJH
  * @version 1.0
@@ -8,6 +11,33 @@ package com.master.chapter13;
  */
 public class InternetProgrammingTest {
     public static void main(String[] args) {
+        InternetProgrammingTest test=new InternetProgrammingTest();
+        test.test1();
+    }
+    public void test1(){
+        try {
+            InetAddress address=InetAddress.getByName("86.86.136.65");
+            System.out.println(address);
+            InetAddress address1=InetAddress.getByName("www.baidu.com");
+            System.out.println(address1);
+            InetAddress address3=InetAddress.getByName("localhost");
+            System.out.println(address3);
+            InetAddress address2=InetAddress.getLocalHost();
+            System.out.println(address2);
+            //    /86.86.136.65
+            //    www.baidu.com/180.101.50.242
+            //    localhost/127.0.0.1
+            //    DESKTOP-O5JSGQM/86.86.136.65
+            System.out.println("---------------------");
+            //获取域名和主机地址
+            System.out.println(address.getHostName());
+            System.out.println(address.getHostAddress());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public void test2(){
 
     }
 }
@@ -25,5 +55,10 @@ public class InternetProgrammingTest {
  *                           传输层：TCP,UDP
  *                           网络层：IP,ICMP,ARP
  *                           数据链路物理层：Link
+ * IP地址类：InetAddress
+ *      192.168.xx.xx是局域网 不是公网 万维网
+ *
+ * 域名：wwww.baidu.com 先通过本地的host文件查看有没有对应的映射，没有就去dns服务器上解析相应的ip地址
+ * 本地回路地址：127.0.0.1  域名/本机地址：localhost
  */
 

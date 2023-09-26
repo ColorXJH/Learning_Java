@@ -2,10 +2,7 @@ package com.master.chapter13;
 
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -121,8 +118,153 @@ public class InternetProgrammingTest {
             }
         }
     }
-    public void test4(){
 
+    //socket-serverSocket网络通信复制文件
+    @Test
+    public void test3Client() {
+        OutputStream outputStream = null;
+        FileInputStream fils = null;
+        Socket socket = null;
+        try {
+            socket = new Socket(InetAddress.getByName("127.0.0.1"), 9090);
+            outputStream = socket.getOutputStream();
+            fils = new FileInputStream("001.jpg");
+            byte[] bytes = new byte[1024];
+            int len;
+            while ((len = fils.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, len);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(outputStream!=null)
+                outputStream.close();
+                if(fils!=null)
+                fils.close();
+                if(socket!=null)
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    @Test
+    public void test3Server() {
+        FileOutputStream fos = null;
+        InputStream inputStream = null;
+        ServerSocket serverSocket = null;
+        Socket accept = null;
+        try {
+            serverSocket = new ServerSocket(9090);
+            accept = serverSocket.accept();
+            inputStream = accept.getInputStream();
+            fos = new FileOutputStream("001_COPY.jpg");
+            byte[] bytes = new byte[1024];
+            int len;
+            while ((len = inputStream.read(bytes)) != -1) {
+                fos.write(bytes, 0, len);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(fos!=null)
+                fos.close();
+                if(inputStream!=null)
+                inputStream.close();
+                if(serverSocket!=null)
+                serverSocket.close();
+                if(accept!=null)
+                accept.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //客户都安发送文件给服务端，服务端保存到本地并返回“发送成功给客户端”
+    @Test
+    public void test4Client(){
+        OutputStream outputStream = null;
+        FileInputStream fils = null;
+        Socket socket = null;
+        InputStreamReader reader=null;
+        try {
+            socket = new Socket(InetAddress.getByName("127.0.0.1"), 9090);
+            outputStream = socket.getOutputStream();
+            fils = new FileInputStream("001.jpg");
+            byte[] bytes = new byte[1024];
+            int len;
+            while ((len = fils.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, len);
+            }
+            //客户都安接收来自于服务器端的数据并显示到控制台上
+            InputStream inputStream = socket.getInputStream();
+            //为了防止乱码 bos可以，也可以使用转换流InputStreamReader 作为桥梁将字节流转换为字符流
+            //ByteArrayOutputStream bos=new ByteArrayOutputStream();
+            reader=new InputStreamReader(inputStream,"UTF-8");
+            char[]chars=new char[10];
+            int clen;
+            while ((clen=reader.read(chars))!=-1){
+                System.out.print(new String(chars,0,clen));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(reader!=null)
+                    reader.close();
+                if(outputStream!=null)
+                    outputStream.close();
+                if(fils!=null)
+                    fils.close();
+                if(socket!=null)
+                    socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void test4Server(){
+        FileOutputStream fos = null;
+        InputStream inputStream = null;
+        ServerSocket serverSocket = null;
+        OutputStream outputStream=null;
+        Socket accept = null;
+        try {
+            serverSocket = new ServerSocket(9090);
+            accept = serverSocket.accept();
+            inputStream = accept.getInputStream();
+            fos = new FileOutputStream("001_COPY.jpg");
+            byte[] bytes = new byte[1024];
+            int len;
+            while ((len = inputStream.read(bytes)) != -1) {
+                fos.write(bytes, 0, len);
+            }
+            //服务器端给与客户都安反馈，
+            outputStream = accept.getOutputStream();
+            outputStream.write("你好，照片我已经收到，谢谢".getBytes("UTF-8"))
+            ;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(outputStream!=null)
+                    outputStream.close();
+                if(fos!=null)
+                    fos.close();
+                if(inputStream!=null)
+                    inputStream.close();
+                if(serverSocket!=null)
+                    serverSocket.close();
+                if(accept!=null)
+                    accept.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 /**

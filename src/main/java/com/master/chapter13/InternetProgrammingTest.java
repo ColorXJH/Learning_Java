@@ -3,10 +3,7 @@ package com.master.chapter13;
 import org.junit.Test;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 
 /**
  * @author ColorXJH
@@ -200,6 +197,9 @@ public class InternetProgrammingTest {
             while ((len = fils.read(bytes)) != -1) {
                 outputStream.write(bytes, 0, len);
             }
+            //socket阻塞式的编程不会终止，需要显示关闭一下数据的输出
+            socket.shutdownOutput();
+
             //客户都安接收来自于服务器端的数据并显示到控制台上
             InputStream inputStream = socket.getInputStream();
             //为了防止乱码 bos可以，也可以使用转换流InputStreamReader 作为桥梁将字节流转换为字符流
@@ -210,6 +210,7 @@ public class InternetProgrammingTest {
             while ((clen=reader.read(chars))!=-1){
                 System.out.print(new String(chars,0,clen));
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -227,6 +228,7 @@ public class InternetProgrammingTest {
             }
         }
     }
+    @Test
     public void test4Server(){
         FileOutputStream fos = null;
         InputStream inputStream = null;
@@ -243,10 +245,13 @@ public class InternetProgrammingTest {
             while ((len = inputStream.read(bytes)) != -1) {
                 fos.write(bytes, 0, len);
             }
+
+            //不会显示关闭 关闭输入数据（其实关闭一个就可以了）
+            accept.shutdownInput();
+
             //服务器端给与客户都安反馈，
             outputStream = accept.getOutputStream();
-            outputStream.write("你好，照片我已经收到，谢谢".getBytes("UTF-8"))
-            ;
+            outputStream.write("你好，照片我已经收到，谢谢".getBytes("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -261,6 +266,81 @@ public class InternetProgrammingTest {
                     serverSocket.close();
                 if(accept!=null)
                     accept.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Test
+    public void testUDPSend() throws IOException {
+        DatagramSocket socket=new DatagramSocket();
+        String str="我是UDP发送端的导弹";
+        byte[] bytes = str.getBytes();
+        InetAddress address=InetAddress.getLocalHost();
+        DatagramPacket packet = new DatagramPacket(bytes,0,bytes.length,address,9090);
+        socket.send(packet);
+        socket.close();
+    }
+    @Test
+    public void testUDPReceive() throws IOException {
+        DatagramSocket socket=new DatagramSocket(9090);
+        byte[] bytes=new byte[100];
+        DatagramPacket packet=new DatagramPacket(bytes,0,bytes.length);
+        socket.receive(packet);
+        System.out.println(new String(packet.getData(),0,packet.getLength()));
+        socket.close();
+    }
+    @Test
+    public void testURL(){
+        try {
+            URL url=new URL("http://localhost:8080/test?name=xjh&age=28");
+            String protocol = url.getProtocol();
+            String host = url.getHost();
+            int port = url.getPort();
+            String path = url.getPath();
+            String file = url.getFile();
+            String query = url.getQuery();
+            System.out.println(protocol);
+            System.out.println(host);
+            System.out.println(port);
+            System.out.println(path);
+            System.out.println(file);
+            //http://localhost:8080/test#a?name=xjh&age=28 这种带锚点的查不出来 显示null
+            System.out.println(query);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+    //启动tomcat服务器，下载上面的资源
+    @Test
+    public void testURLDownload() {
+        InputStream inputStream = null;
+        FileOutputStream fileOutputStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL("http://localhost:8080/examples/index.html");
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.connect();
+            inputStream = urlConnection.getInputStream();
+            fileOutputStream = new FileOutputStream("index_copy.html");
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, len);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
+            try {
+                if (inputStream!=null)
+                inputStream.close();
+                if(fileOutputStream!=null)
+                fileOutputStream.close();
+                if(urlConnection!=null)
+                urlConnection.disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -318,4 +398,29 @@ public class InternetProgrammingTest {
  *      可以广播发送
  *      发送给数据结束时无需释放资源，开销小，速度快
  *
+ */
+
+/**
+ * udp网络通信
+ * 类DatagramSocket和DatagramPacket实现了基于UDP协议网络程序
+ * UDP数据报通过数据报套接字DataGramSocket发送和接收，系统不保证UDP数据报一定能安全的送达到目的地，也不能确定什么时间可以抵达
+ * DataGramPacket对象封装了UDP数据包，在数据报中包含了发送端的ip和端口号和接收端的ip和端口号
+ * UDP协议中每个数据报都给出了完整的地址信息，因此无需建立发送方和接受方的连接，如同发快递包裹一样
+ */
+
+/**
+ * URL网络编程
+ * URL:统一资源定位符，它表示internet上某一资源的地址
+ * 它是一种具体的uri,即url可以用来标识一个资源，而且还指明了如何locate这个资源
+ * 通过url我们可以访问internet上的各种网络资源，比如常见的www,ftp站点，浏览器通过解析给定的url可以在网络上查找相应的文件或者而其他资源
+ * URL的基本结构由5部分组成：
+ *  传输协议://主机名:端口号/文件名#片段名?参数列表   片段名：即锚点 可以直接定位到某个位置     参数列表：k1=v1&k2=v2
+ *  http://127.0.0.1/test1#a?name=xjh&age=28
+ *      一个URL对象生成后，其属性是不能被改变的，但是可以通过他给定的方法来获取这些属性：
+ *          getProtocol() 获取url协议名
+ *          getHost() 获取url主机名
+ *          getPort() 获取url端口号
+ *          getPath() 获取url文件路径
+ *          getFile() 获取url的文件名
+ *          getQuery() 获取url的查询名
  */

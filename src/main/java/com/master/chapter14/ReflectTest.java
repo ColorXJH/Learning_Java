@@ -1,5 +1,7 @@
 package com.master.chapter14;
 
+import org.junit.Test;
+
 /**
  * @ClassName: ReflectTest
  * @Package: com.master.chapter14
@@ -10,6 +12,18 @@ package com.master.chapter14;
 public class ReflectTest {
     public static void main(String[] args) {
 
+    }
+
+    //反射之前对于Person类的操作
+    @Test
+    public void beforeReflect(){
+        //1 创建Person类的对象
+        Person person=new Person("Tom",12);
+        //2 通过对象，调用其内部的属性和方法
+        person.age=10;
+        System.out.println(person.toString());
+        person.show();
+        //在person类外部，不可以通过其对象 调用其内部私有的结构，比如私有方法，私有变量 私有的构造器，受到封装性的限制
     }
 }
 

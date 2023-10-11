@@ -64,7 +64,28 @@ public class ReflectTest {
         Person kcy_zyf = constructor1.newInstance("KCY_ZYF");
         System.out.println(kcy_zyf);
 
-        //4:获取Class实例的4中方式
+
+    }
+
+    //4:获取Class实例的4中方式
+    public void testGetClassInstanceType() throws ClassNotFoundException {
+        //方式1：调用运行时类的属性 .class
+        Class<Person> personClass = Person.class;
+        System.out.println(personClass);
+        //方式2：通过运行时类的对象获取getClass()方法
+        Person ps=new Person();
+        Class<? extends Person> aClass = ps.getClass();
+        //方式3：调用Class的静态方法forName(String classpath)
+        Class<?> aClass1 = Class.forName("com.master.chapter14.Person");
+        //加载到内存中的运行时类，会缓存一定的时间，在此时间之内，我们可以通过不同的方式来获取此运行时类
+        System.out.println(personClass==aClass);//true
+        System.out.println(personClass==aClass1);//true
+        //方式4：使用类的加载器：ClassLoader
+        ClassLoader classLoader = ReflectTest.class.getClassLoader();
+        Class<?> aClass2 = classLoader.loadClass("com.master.chapter14.Person");
+        System.out.println(aClass2==personClass);//true
+        //方式3的使用频率较高
+
     }
 }
 

@@ -2,10 +2,14 @@ package com.master.chapter14;
 
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Properties;
 
 /**
  * @ClassName: ReflectTest
@@ -87,6 +91,85 @@ public class ReflectTest {
         //方式3的使用频率较高
 
     }
+    @Test
+    public void testWhoCanHaveClassObject(){
+        Class c1=Object.class;
+        Class c2=Comparable.class;
+        Class c3=String[].class;
+        Class c4=int[][].class;
+        Class c5= ElementType.class;
+        Class c6=Override.class;
+        Class c7=int.class;
+        Class c8=void.class;
+        Class c9=Class.class;
+        int[]a=new int[10];
+        int[]b=new int[100];
+        Class a1=a.getClass();
+        Class b1=b.getClass();
+        //只要元素类型与维度一样，就是同一个Class
+        System.out.println(a1==b1);
+    }
+    @Test
+    public void testClassLoader(){
+        //自定义类使用系统类加载器
+        ClassLoader classLoader = ReflectTest.class.getClassLoader();
+        System.out.println(classLoader);
+        //获取扩展类加载器
+        ClassLoader parent = classLoader.getParent();
+        System.out.println(parent);
+        //引导类加载器（是无法获取的）,主要负责加载java的核心类库
+        ClassLoader parent1 = parent.getParent();
+        //null 不是没有，只是你获取不到引导类加载器
+        System.out.println(parent1);
+        //核心类库的类加载器我们是无法拿到的
+        ClassLoader classLoader1 = String.class.getClassLoader();
+        System.out.println(classLoader1);
+    }
+    @Test
+    public void testUseClassLoaderLoadProperties() throws IOException {
+        //1：Properties 用来读取配置文件的
+        Properties properties=new Properties();
+//        FileInputStream inputStream=new FileInputStream("jdbc.properties");
+//        properties.load(inputStream);
+
+        //2：使用类加载器加载配置文件
+        ClassLoader classLoader = ReflectTest.class.getClassLoader();
+        //此时的识别位置不在项目下，resources资源目录下
+        InputStream resourceAsStream = classLoader.getResourceAsStream("jdbc2.properties");
+        properties.load(resourceAsStream);
+
+        String user = properties.getProperty("user");
+        String password = properties.getProperty("password");
+        System.out.println(user+"--"+password);
+
+
+
+    }
+    @Test
+    public void testCreateRuntimeClassObject() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        //创建运行时类的对象 通过反射而不是new
+        Class<?> aClass = Class.forName("com.master.chapter14.Person");
+        //创建对应的运行时类的对象，注意它和获取类的构造器的区别，这里需要访问权限，获取构造器可以直接设置访问权限
+        Object o = aClass.newInstance();
+        System.out.println(o);
+        Person person=(Person) o;
+        person.show();
+        //javabean要求类提供一个空参的构造器：
+            //1:便于反射创建运行时类的对象
+            //2:便于子类继承此运行时父类的时候，默认调用super()时，保证父类有此构造器
+    }
+
+    //创建一个指定类的对象，体会反射的动态性
+    @Test
+    public void testCreateSomeClassInstance() throws Exception {
+        Object instance = getInstance("com.master.chapter14.Person");
+        Person person=(Person) instance;
+        person.show();
+    }
+    private Object getInstance(String classpath) throws Exception{
+        Class<?> aClass = Class.forName(classpath);
+        return  aClass.newInstance();
+    }
 }
 
 /**
@@ -129,4 +212,50 @@ public class ReflectTest {
  *          以前通过类去造对象-》现在类本身也是一个对象，是Class的对象 Class类是class类的更高一级抽象 将所有的class类本身抽象出来，得到一个新的类Class,注意大小写
  *          换句话说：Class的实例就对应一个运行时类
  *              万事万物皆对象：对象.xxx;File;URL;类本身也是对象=》反射;前端，数据库，在java层面都是对象
+ */
+
+/**
+ * 哪些类型可以有Class对象：
+ *  1: class: 外部类，成员（成员内部类，静态内部类），局部内部类，匿名内部类
+ *  2: interface: 接口
+ *  3: 数组【】
+ *  4: enum: 枚举
+ *  5: annotation: 注解@interface
+ *  6: primitive type: 基本数据类型
+ *  7: void
+ */
+
+/**
+ * 类的加载过程与ClassLoader的理解
+ *      当程序主动使用某个类时，如果该类还未被加载到内存中，则系统会通过如下三个步骤来对该类进行初始化
+ *          1：类的加载load
+ *              将类的class文件读入内存，并为之创建一个java.lang.Class对象，此过程由类加载器完成
+ *                  将class文件字节码内容加载到内存中，并将这些静态数据转换为方法区的运行时数据结构，然后生成一个代表这个类的java.lang.Class对象
+ *                  作为方法区中类数据的访问入口（即引用地址），所有需要访问和使用类数据只能通过这个Class对象，这个加载的过程需要类加载器参与
+ *          2：类的连接Link
+ *              将类的二进制数据合并到JRE中
+ *                  将java的二进制代码合并到JVM的运行状态之中的过程
+ *                  验证：确保加载的类信息符合JVM规范，例如 以cafe开头，没有安全方面的问题
+ *                  准备：正式为类变量（static）分配内存并设置变量默认初始值的阶段，这些内存都将在方法区中进行分配
+ *                  解析：虚拟机常量池内的符号引用（常量名）替换为直接引用（地址）的过程
+ *          3：类的初始化Initialize
+ *              JVM负责对类进行初始化
+ *                  执行类构造器<clinit>()方法的过程，类构造器<clinit>()方法是由编译期自动收集类中所有类变量的赋值动作和静态代码块中的语句合并产生的
+ *                  类构造器是构造类信息的，不是构造该类对象的构造器
+ *                  当初始化一个类的时候，如果发现其父类还没有进行初始化，则需要先触发其父类的初始化
+ *                  虚拟机会保证一个类的<clinit>()方法在多线程环境下被正确加锁和同步
+ *          过程如下：
+ *              源程序（。java文件）-》java编译器-》字节码（。class文件）-》类加载器-》字节码校验器-》解释器-》操作系统平台
+ *          类加载器的作用：
+ *              类加载的作用；将字节码文件加载到内存中，并将这些静态数据转换为方法区的运行时数据结构，然后在堆中生成一个java.lang.Class对象，
+ *                  作为方法区中类数据的访问入口
+ *              类缓存的作用：标准的javase类加载器可以按要求查找类，但是一旦某个类被加载到类加载器中，它将维持加载（缓存）一段时间，不过JVM垃圾回收机制可以
+ *                  回收这些Class对象
+ *          了解ClassLoader:
+ *              类加载器的作用是把类class加载进内存的，JVM规范定义了如下类型的类加载器
+ *              自定义类加载器=》System ClassLoader=>Extension ClassLoader=>Bootstrap ClassLoader
+ *                      从左到右检查类是否装载   ，从右到左尝试加载类
+ *                      Bootstrap ClassLoader:引导类加载器：用c++编写，是jvm自带的类加载器，负责java平台核心库，用来装载核心类库，该加载器无法直接获取
+ *                      Extension ClassLoader:扩展类加载器：负责jre/lib/ext目录下的jar包或者-D java.ext.dirs指定目录下的jar包装入工作库
+ *                      System ClassLoader:系统类加载器：负责 java -classpath 或者 -D java.class.path所指定目录下的类与jar包装入工作库，是最常用的加载器
  */

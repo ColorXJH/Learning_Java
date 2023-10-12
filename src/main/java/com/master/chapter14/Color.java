@@ -10,6 +10,7 @@ import java.io.IOException;
  */
 @MyAnnotation(value = "ColorXJH")
 public class Color extends Base<String> implements Comparable<String>,MyInterface{
+    private static int weight=220;
     private String name;
     int age;
     public int id;
@@ -41,4 +42,18 @@ public class Color extends Base<String> implements Comparable<String>,MyInterfac
         return 0;
     }
 
+    private static String showStatic(String name){
+        System.out.println("----+++++______"+name);
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Color{" +
+                "weight=" + weight +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", id=" + id +
+                '}';
+    }
 }

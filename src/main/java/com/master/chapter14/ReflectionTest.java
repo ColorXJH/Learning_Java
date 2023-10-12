@@ -145,6 +145,86 @@ public class ReflectionTest {
             }
         }
     }
+
+    //获取运行时类的接口
+    @Test
+    public void testRuntimeInterface(){
+        Class<Color> colorClass = Color.class;
+        //获取该类实现的接口
+        Class<?>[] interfaces = colorClass.getInterfaces();
+        for(Class s:interfaces){
+            System.out.println(s);
+        }
+        //获取运行时类的父类的接口
+        System.out.println("------------------------- ");
+        Class<?>[] interfaces1 = colorClass.getSuperclass().getInterfaces();
+        for(Class s:interfaces1){
+            System.out.println(s);
+        }
+    }
+
+
+    //获取运行时类所在的包
+    @Test
+    public  void testRuntimeClassPackage(){
+        Class clazz=Color.class;
+        Package aPackage = clazz.getPackage();
+        System.out.println(aPackage);
+    }
+
+
+    //获取运行时类所声明的注解
+    @Test
+    public  void testRuntimeClassAnnotation(){
+        Class clazz=Color.class;
+        Annotation[] annotations = clazz.getAnnotations();
+        for(Annotation s:annotations){
+            System.out.println(s);
+        }
+    }
+
+    //调用运行时类指定的结构：属性、方法、构造器
+    @Test
+    public void testInvokeRunTimeClassFieldMethodConstructor() throws NoSuchFieldException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Class clazz=Color.class;
+        //获取指定属性
+        Field name = clazz.getDeclaredField("name");
+        Field id = clazz.getField("id");
+        Field weight=clazz.getDeclaredField("weight");
+        weight.setAccessible(true);
+
+        //创建运行时类的对象
+        Object o = clazz.newInstance();
+        id.set(o,1001);
+        Object o1 = id.get(o);
+        //静态属性前面可以不设置，显示书写null
+        weight.set(null,1222);
+        System.out.println(o1);
+
+        name.setAccessible(true);
+        name.set(o,"Color");
+        System.out.println(o);
+        //获取指定类型的方法
+        Method method=clazz.getDeclaredMethod("display",String.class);
+        method.invoke(o,"ColorXJH");
+        //获取静态方法
+        System.out.println("----获取静态方法----");
+        Method method1=clazz.getDeclaredMethod("showStatic",String.class);
+        method1.setAccessible(true);
+        //null 或者Color.class都可以
+        Object static_method = method1.invoke(null, "static_method");
+        System.out.println(static_method);
+
+        //获取类中指定的构造器
+        System.out.println("---------调用类的指定的构造器---------");
+        Constructor declaredConstructor = clazz.getDeclaredConstructor(String.class);
+        //设置访问权限
+        declaredConstructor.setAccessible(true);
+        //调用此构造器创建运行时类的对象
+        Object my_name_is_lihua = declaredConstructor.newInstance("my name is lihua");
+        //输出该对象
+        System.out.println(my_name_is_lihua);
+    }
 }
 
 //        为什么这里会有两个compareTo方法?

@@ -170,6 +170,11 @@ public class ReflectTest {
         Class<?> aClass = Class.forName(classpath);
         return  aClass.newInstance();
     }
+    
+    @Test
+    public void showClassStructure(){
+
+    }
 }
 
 /**

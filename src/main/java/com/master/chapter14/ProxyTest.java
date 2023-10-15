@@ -23,6 +23,7 @@ public class ProxyTest {
     @Test
     public void dynamicProxy(){
         ClothFactory proxyInstance = (ClothFactory) DynamicProxy.getProxyInstance(new StaticImpl());
+        System.out.println("______________test---"+proxyInstance);
         proxyInstance.produceCloth();
 
     }
@@ -79,8 +80,16 @@ class MyInvocationHandler implements InvocationHandler{
     //将被代理类要执行的方法a的功能就声明在invoke()中
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        ClothFactoryUtil  c_util=new ClothFactoryUtil();
+        c_util.method1();
+        //proxy==Proxy.newProxyInstance返回的动态代理对象，
+        //需要注意的是，如果在invoke方法中再次调用代理对象的方法，会导致递归调用，可能会引发StackOverflowError异常。
+        //因此，在invoke方法中，我们通常会避免直接调用代理对象的方法，而是调用Method对象的invoke方法来间接调用。
+        System.out.println(proxy==target);
         System.out.println("---动态代理开始搞事情了---");
-        return method.invoke(target,args);
+        Object objs= method.invoke(target,args);//面向切面编程
+        c_util.method2();
+        return objs;
     }
 }
 
@@ -93,6 +102,20 @@ class MyInvocationHandler implements InvocationHandler{
  *   动态代理：客户通过代理类来调用其他对象的方法，并且是在程序运行时根据需要动态创建目标类的代理对象
  *      使用场景：调试，远程方法调用
  *      优点：抽象角色中（接口）声明的所有方法都被转移到调用处理器一个集中的方法中处理，这样我们可以更加灵活的同意处理众多方法
- *
+ */
+
+/**
+ * 动态代理与AOP
+ *      前面介绍的Proxy和InvocationHandler，很难看出这种动态代理的优势，下面介绍一种更实用的动态代理机制
  *
  */
+
+class ClothFactoryUtil{
+    public void method1(){
+        System.out.println("通用方法1-----------");
+    }
+
+    public void method2(){
+        System.out.println("通用方法2-----------");
+    }
+}

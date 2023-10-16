@@ -2,8 +2,14 @@ package com.master.chapter15;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * @ClassName: LambdaTest
@@ -66,6 +72,49 @@ public class LambdaTest {
         //形式6: 方法引用形式
         Comparator<Integer>c3=Integer::compare;
     }
+    @Test
+    public void testFourFunctionalInterface(){
+        //Consumer消费者接口
+        happyTime(500,money-> System.out.println("今天出门消费了多少钱："+money));
+        //Supplier生产者
+        String s1 = testSupplier(() -> "xjh");
+        System.out.println(s1);
+        //判断者
+        List<String>list= Arrays.asList("北京","天津","上海","广州");
+        List<String> strings = filterString(list, s -> s.contains("海"));
+        System.out.println(strings);
+        //函数型接口
+        List<Integer> list1 = testFunction(list, (String o1) -> {
+            if (o1.contains("州")) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        System.out.println(list1);
+    }
+    public void happyTime(double money,Consumer<Double> consumer){
+        consumer.accept(money);
+    }
+    public List<String> filterString(List<String>list, Predicate<String>pre){
+        ArrayList<String> filterList=new ArrayList<>();
+        for(String s:list){
+            if(pre.test(s)){
+                filterList.add(s);
+            }
+        }
+        return filterList;
+    }
+    public String testSupplier(Supplier<String>supplier){
+        return supplier.get();
+    }
+    public List<Integer>testFunction(List<String>list, Function<String,Integer>function){
+        ArrayList<Integer>listss=new ArrayList<>();
+        for(String str:list){
+            listss.add(function.apply(str));
+        }
+        return listss;
+    }
 }
 
 /**
@@ -120,4 +169,12 @@ public class LambdaTest {
  *
  *      匿名类实现的表达式现在部分可以使用lambda来书写
  *
+ */
+
+/**
+ * java内置四大核心函数式接口
+ *      Consumer<T> 消费型接口:对类型为T的对象应用操作，包含方法void accept(T t)
+ *      Supplier<T> 共给型接口:返回类型为T的对象，包含方法T get()
+ *      Function<T,R> 函数型接口:对类型为T的对象进行操作，并返回结果，结果是R类型的对象，包含方法 R apply(T t)
+ *      Predicate<T> 断定型接口:确定类型为T的对象是否满足某约束，并返回boolean值，包含方法 boolean test(T t)
  */

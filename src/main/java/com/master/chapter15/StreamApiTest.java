@@ -2,9 +2,8 @@ package com.master.chapter15;
 
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -111,6 +110,13 @@ public class StreamApiTest {
         Optional<Double> reduce2 = employees.stream().map(d -> d.getPrice()).reduce(Double::sum);
         System.out.println(reduce1);
         System.out.println(reduce2.get());
+        //收集  流中元素收集到list
+        List<Employee> collect = employees.stream().filter(d -> d.getPrice() > 300).collect(Collectors.toList());
+        collect.forEach(System.out::println);
+            //流中元素收集到Set
+        Set<Employee> collect1 = employees.stream().filter(d -> d.getPrice() > 300).collect(Collectors.toSet());
+            //流中元素收集到创建的集合
+        ArrayList<Employee> collect2 = employees.stream().filter(d -> d.getPrice() > 300).collect(Collectors.toCollection(ArrayList::new));
     }
 }
 
@@ -176,5 +182,8 @@ public class StreamApiTest {
  *              reduce(T t,BinaryOperator b):可以讲流中元素反复结合起来，得到一个值，返回T
  *              reduce(BinaryOperator b):可以将流中元素反复结合起来，得到一个值，返回Optional<T>
  *                  map和reduce的连接通常被称为map-reduce 模式，因谷歌用它来进行网络搜索而出名
- *
+ *          3：收集
+ *              collect(Collector c):将流转换为其他形式，接收一个Collector接口的实现，用于给Stream中元素做汇总的方法
+ *                  Collector接口中方法的实现决定了如何对流执行收集的操作，如收集到List,Set,Map
+ *                  另外，Collectors实用类提供了很多静态方法，可以方便的创建常见收集器实例，具体方法与实例如下表
  */

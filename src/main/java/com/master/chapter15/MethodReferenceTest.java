@@ -22,7 +22,7 @@ public class MethodReferenceTest {
         list.add(new Employee(21,"color2",300.00,1002));
         list.add(new Employee(22,"color3",400.00,1003));
         list.add(new Employee(23,"color4",500.00,1004));
-        list.add(new Employee(24,"color5",600.00,1005));
+        list.add(new Employee(23,"color4",500.00,1004));
         return list;
     }
     //对象::实例方法

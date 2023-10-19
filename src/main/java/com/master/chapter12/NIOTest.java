@@ -1,7 +1,5 @@
 package com.master.chapter12;
 
-import org.omg.Messaging.SyncScopeHelper;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;

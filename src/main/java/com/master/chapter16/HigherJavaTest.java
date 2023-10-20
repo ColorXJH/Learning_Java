@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 /**
  * @author ColorXJH
@@ -38,6 +40,38 @@ public class HigherJavaTest {
             }
         }
 
+    }
+
+    @Test
+    public void testOnJava8(){
+        //资源的自动关闭
+        try(InputStreamReader reader=new InputStreamReader(System.in);)
+        {
+            char[] ch=new char[20];
+            int len;
+            if((len=reader.read(ch))!=-1){
+                String str=new String(ch,0,len);
+                System.out.println(str);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    @Test
+    public void testAfterJava8(){
+        //自动关闭的资源的实例化是可以放在try外部的，可以使用，不可修改
+        InputStreamReader reader=new InputStreamReader(System.in);
+        //OutputStreamWriter writer=new OutputStreamWriter(System.out);
+        try(reader;/*writer;*/) {
+            char[] ch=new char[20];
+            int len;
+            if((len=reader.read(ch))!=-1){
+                String str=new String(ch,0,len);
+                System.out.println(str);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -114,8 +148,15 @@ public class HigherJavaTest {
  *          }catch(Exception e){
  *              e.printStackTrace();
  *          }
- *
- *
+ *      java9中，用资源语句编写try将更加容易，我们可以在try子句中使用已经初始化过的资源，此时的资源是final的
+ *          InputStreamReader reader=new InputStreamReader(System.in)
+ *          OutputStreamWriter writer=new OutputStreamWriter(System.out);
+ *          try(reader;writer;){
+ *              //reader/writer是final的，不可被再次赋值
+ *          }catch(Exception e){
+ *              e.printStackTrace()
+ *          }
+ * String底层存储结构的变更
  *
  *
  *

@@ -1,5 +1,10 @@
 package com.master.chapter16;
 
+import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 /**
  * @author ColorXJH
  * @version 1.0
@@ -7,6 +12,33 @@ package com.master.chapter16;
  * @date 2023-10-18 15:23
  */
 public class HigherJavaTest {
+    public static void main(String[] args) {
+        HigherJavaTest test=new HigherJavaTest();
+        test.testBeforeJava8();
+    }
+    @Test
+    public void testBeforeJava8(){
+        InputStreamReader reader= null;
+        try {
+            reader = new InputStreamReader(System.in);
+            char[] ch=new char[20];
+            int len;
+            if((len=reader.read(ch))!=-1){
+                String str=new String(ch,0,len);
+                System.out.println(str);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(reader!=null)
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
 }
 
 /**
@@ -62,4 +94,29 @@ public class HigherJavaTest {
  *      /open 文件路径，调用脚本文件（就是在命令行中的代码文件）
  *      jShell没有受检异常，本来应该强迫我们捕获的，但是jShell在后台为我们隐藏掉了，所以我们声明哪些带受检异常的操作时不需要try-catch了
  *      /exit 退出
+ * 接口的私有方法
+ *      java8中规定接口中的方法除了抽象方法之外，还可以定义静态方法和默认方法，在一定的基础上扩展了接口的功能，此时的接口更像是一个抽象类
+ *              接口中出现了方法体
+ *      在java9中，接口更加灵活和强大，连方法的访问权限修饰符都可以为private的了，此时方法讲称为你对外暴露的api的一部分
+ * 钻石操作符的使用升级
+ *      jdk9之后，我们将能够与匿名实现类共同使用钻石（范型）操作符，在java8中如下操作时会报错的
+ *          Comparator<Object>com=new Comparator<>(){
+ *                  @Override
+ *                  public int compare(Object o1,Object o2){
+ *                      return 0;
+ *                  }
+ *          }
+ *          JDK8中会出现编译报错，cannot use <> with anonymous inner class
+ * 语法改进：try语句
+ *      java8中，可以实现资源的自动关闭，但是要求执行后必须关闭的所有资源必须在try中完成初始化，否则不能通过编译，如下：
+ *          try(InputStreamReader reader=new InputStreamReader(System.in)){
+ *              //读取数据细节
+ *          }catch(Exception e){
+ *              e.printStackTrace();
+ *          }
+ *
+ *
+ *
+ *
+ *
  */

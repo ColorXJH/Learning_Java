@@ -9,4 +9,21 @@
     requires JAVA9TEST;
     requires junit;
     requires java.sql;
+    exports com.master.chapter01;
+    exports com.master.chapter02;
+    exports com.master.chapter03;
+    exports com.master.chapter04;
+    exports com.master.chapter05;
+    exports com.master.chapter06;
+    exports com.master.chapter07;
+    exports com.master.chapter08;
+    exports com.master.chapter09;
+    exports com.master.chapter10;
+    exports com.master.chapter11;
+    exports com.master.chapter12;
+    exports com.master.chapter13;
+    exports com.master.chapter14;
+    exports com.master.chapter15;
+    exports com.master.chapter16;
+
 }

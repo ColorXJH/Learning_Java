@@ -2,10 +2,10 @@ package com.master.chapter16;
 
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author ColorXJH
@@ -17,6 +17,7 @@ public class HigherJavaTest {
     public static void main(String[] args) {
         HigherJavaTest test=new HigherJavaTest();
         test.testBeforeJava8();
+        test.testInputStreamAdd();
     }
     @Test
     public void testBeforeJava8(){
@@ -72,6 +73,90 @@ public class HigherJavaTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    //jdk9:集合工厂方法创建只读集合
+    @Test
+    public void testCollectionFactoryCreateReadOnlyCollection(){
+        //之前 list set map等
+        List<String> list=new ArrayList<>();
+        list.add("123");
+        list.add("234");
+        list= Collections.unmodifiableList(list);
+        //list.add("4677");
+        //这个方法也创建了不可修改的集合
+        List<Integer> integers = Arrays.asList(1, 2, 3, 4, 5);
+
+        //jdk8以及之后得写法：
+        Map<String,Integer> map=Collections.unmodifiableMap(new HashMap<String,Integer>(){
+            {
+                put("a",1);
+                put("b",2);
+                put("c",3);
+                put("d",4);
+            }
+        });
+        map.forEach((k,v)-> System.out.println(k+"v"));
+        //下面也是9创建只读的集合
+        List<Integer> integers1 = List.of(1, 2, 3, 4, 5, 6);
+        Set<Integer> integers2 = Set.of(2, 3, 4, 5, 5, 5, 6);
+        Map<String, Integer> tom = Map.of("tom", 23, "xjh", 33);
+        Map<Integer, Integer> integerIntegerMap = Map.ofEntries(Map.entry(123, 345), Map.entry(345, 567));
+
+    }
+
+    @Test
+    public void testInputStreamAdd(){
+        ClassLoader cl=this.getClass().getClassLoader();
+        //test  main方法都一样
+        //资源文件夹下查找
+        try(InputStream is=cl.getResourceAsStream("name.txt");
+            //项目目录下存放
+        OutputStream os=new FileOutputStream("name_copys.txt");
+        ) {
+            //把输入流中的数据直接复制到输出流中
+            is.transferTo(os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testStreamApiAdd(){
+        Stream<Integer> limit = Stream.iterate(0, d -> d + 1).limit(10);
+        //返回从头开始的指定规则的尽量多的元素
+        limit.takeWhile(x->x<7).forEach(System.out::println);
+        Stream<Integer> limit2 = Stream.iterate(0, d -> d + 1).limit(10);
+        System.out.println("------------");
+        //返回剩余的元素
+        limit2.dropWhile(x->x<7).forEach(System.out::println);
+        System.out.println("------------");
+        Stream<Integer> integerStream = Stream.of(1, 2, 3, 4, null);//5个
+        //不能只有null,可以多个值，其中包含一个空的
+        //Stream<Integer> integerStream2 = Stream.of(null);//5个
+        //下面是可以的
+        Stream<Integer> integerStream2 = Stream.of(null,null);//5个
+        integerStream2.forEach(System.out::println);
+        Integer i=10;
+        i=null;
+        //允许创建一个参数为null的流 类似OPptional的ofNullable
+        Stream<Integer> integerStream1 = Stream.ofNullable(i);
+        //对比jdk8新增了一个自定义的终止条件
+        Stream.iterate(0,x->x<100,x->x+1).forEach(System.out::println);
+
+    }
+    @Test
+    public void testOptionalStream(){
+        List<String> list=new ArrayList<>();
+        list.add("Tom");
+        list.add("Jerry");
+        list.add("Tim");
+        Optional<List<String>>optional=Optional.ofNullable(list);
+        Stream<List<String>> stream = optional.stream();
+        Stream<List<String>> stream1 = optional.stream();
+        stream.forEach(System.out::println);
+        stream1.flatMap(x->x.stream()).forEach(System.out::println);
+
     }
 }
 
@@ -157,7 +242,34 @@ public class HigherJavaTest {
  *              e.printStackTrace()
  *          }
  * String底层存储结构的变更
- *
- *
- *
+ *         动机：
+ *              当前的string类春初字符串的实现就是使用字符数组，使用两个字节（16比特位）存储每一个字符，从众多的应用系统收集道德数据，
+ *              string字符串是堆空间的主要组成部分，并且，大多数的string字符串是只包含拉丁字符的，这些字符只需要一个字节就可以存储，这样另一半的
+ *              就通常处于未使用状态
+ *         解释：
+ *              我们改变string存储的内部结构，让一个String从一个UTF-16的字符数组编程一个字节数组外加上一个编码标志域，新的string存储字符串编码
+ *              即使用iso-8859-1(一个字节存储字符)又使用UTF-16(两个字节存储一个字符)，基于存储的字符串内容，编码标志决定了那种编码方式将被使用
+ *              string改变了，那么和string相关的也改变了，比如：StringBuffer/StringBuilder
+ * 集合工厂方法：快速创建只读集合
+ *      要创建一个只读，不可改变的集合，必须构造和分配它，然后添加元素，最后包装成一个不可修改的集合
+ *              List<String>list=new ArrayList<>();
+ *              list.add("123");
+ *              list.add("234");
+ *              list.add("345");
+ *              list=Collections.unmodifiableList(list)
+ *                  我们一下写了5行，即：他不能表达为单个表达式
+ * InputStream加强
+ *      inputStream终于有了一个非常有用的方法：transferTo,可以用来将数据直接传输到OutputStream.这是在处理原始数据流时，非常常见的一种做法
+ *          详情见上方代码
+ * 增强的StreamAPI
+ *      JDK9中，stream api变得更好，stream接口中添加了四个新的方法：takeWhile,dropWhile,ofNullable,还有一个iterate方法的重载方法，可以让你
+ *      提供一个Predicate(判断条件)来指定什么时候结束迭代
+ *      除了对Stream本身的扩展，Optional和Stream之间的结合也得到了改进，现在可以通过Optional的新方法stream(),将一个Optional对象转换成一个
+ *      或者可能是空的Stream对象
+ * Optional获取Stream的方法
+ *      Optional类中stream()方法的使用，
+ * Nashorn:javascript引擎升级
+ *      nashorn项目在jdk9中得到改进，他为java提供轻量级的javascript运行时环境，nashorn跟随netscape的rhino项目，目的是为了在java中实现一个
+ *      高性能但轻量级的javascript运行时，nashorn项目使得java应用能够嵌入javascript.他在jdk8中为java提供一个javascript引擎
+ *      java9包含一个用来解析Nashorn的EcmaScript语法数的api,这个api使得ide和服务端框架不需要依赖Nashorn项目的内部实现，就能够分析EcmaScript
  */

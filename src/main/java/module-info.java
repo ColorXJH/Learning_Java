@@ -9,6 +9,7 @@
     requires JAVA9TEST;
     requires junit;
     requires java.sql;
+    requires java.net.http;
     exports com.master.chapter01;
     exports com.master.chapter02;
     exports com.master.chapter03;

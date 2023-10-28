@@ -10,6 +10,9 @@ import org.junit.Test;
  * @author: ColorXJH
  */
 public class JDK14_15_Test {
+    public static void main(String[] args) {
+        Runnable r=()-> System.out.println("ColorXJH");
+    }
 
     @Test
     public void testInstanceOf(){
@@ -208,6 +211,7 @@ public class JDK14_15_Test {
 /**
  * java 15的新特性
  *      EdDSA数字签名算法
+ *          与现有的jdk签名方案相比EdDSA具有更高的安全性和性能，因此备受关注，已经在OpenSSL和BoringSSL等加密库中得到了支持，是一种现在的椭圆曲线方案，具有jdk中现有签名算法的优点
  *      密封类（预览）
  *          密封的类和接口：
  *              通过密封的类和接口来增强java编程语言，是新的预览特性
@@ -215,17 +219,59 @@ public class JDK14_15_Test {
  *              具体使用：
  *                  使用修饰符sealed,你可以将一个类声明为密封类，密封的类使用reserved关键字permits列出可以直接扩展他的类，子类可以是最终的，密封的或者非密封的
  *      隐藏类
+ *          该提案通过启用标准API来定义无法发现且具有有限生命周期的隐藏类，从而提高JVM上所有语言的效率，jdk内部和外部的框架能够动态生成类，而这些类可以定义隐藏类，通常来说jvm的
+ *          很多语言都有动态生成类的机制，这样可以提高语言的灵活性和效率
+ *              隐藏类天生为框架而设计，在运行时生成内部class
+ *              隐藏类只能通过反射访问，不能直接被其他类的字节码访问
+ *              隐藏类可以独立于其他类加载、卸载、这样可以减少框架的内存占用
+ *          定义：
+ *              就是不能直接被其他class的二进制代码使用的class,它主要被一些框架用来生成运行时类，但是这些类不是被用来直接使用的，而是通过反射机制来调用
+ *              比如在jdk8中引入了lambda表达式，jvm并不会在编译时期将lambda表达式转换为专门的类，而是在运行时将相应的字节码动态生成相应的类对象
+ *              另外，使用动态代理也可以为某些类生成新的动态类
+ *          那么我们希望这些动态生成的类需要具有什么特性呢？：
+ *              不可发现性：应为我们是为某些静态的类动态生成的动态类，所以我们希望把这个动态生成的类看作是静态类的一部分，所以我们不希望除了该静态类之外的其他机制发现
+ *              访问控制：我们希望在访问控制静态类的同时，也能控制到动态生成的类
+ *              生命周期：动态生成的类的生命周期一般都比较短，我们并不需要将其保存和静态的生命周期一致
+ *          API的支持：
+ *              所以我们需要一些api来定义无法发现的且具有有限生命周期的隐藏类，这将提高所有基于jvm的语言实现的效率
+ *                  java.lang.refelect.Proxy可以定义隐藏类作为实现代理接口的代理类
+ *                  java.lang.invoke.StringConcatactory可以生成隐藏类来保存常量连接方法
+ *                  java.lang.invoke.LambdaMetaFactory可以生成隐藏类的nestmate类，以容纳访问封闭变量的lambda主体
+ *                      普通类是通过调用ClassLoader::defineClass创建的，而隐藏类是通过调用Lookup::defineHiddenClass创建的，这使JVM从提供的字节码中，
+ *                      派生一个隐藏类，连接该隐藏类，并返回提供对隐藏类的反射访问的查找对象，调用程序可以通过返回的查找对象来获取隐藏类的Class对象
  *      移除  Nashorn JavaScript引擎
+ *          取而代之的是GraalVM:在HotSpot基础上增强而形成的跨语言全栈虚拟机
  *      重新实现Legacy DatagramSocket API
+ *          java.net.datagram.Socket和java.net.MulticastSocket的当前实现可以追溯到jdk1.0,那时候ipv6还在开发中，因此当前的多播套接字实现尝试调和ipv4和ipv6难以维护的方式
+ *          通过替换java.net.datagram的基础实现，重新实现旧版DatagramSocket API
+ *          更改java.net.DatagramSocket和java.net.MulticastSocket为更简单、现代化的底层实现
  *      禁用偏向锁定
+ *          HotSpot虚拟机使用改优化来减少非竞争锁定的开销
  *      instanceof模式匹配（第二次预览）
+ *          继java14引入之后，没有做任何修改
  *      ZGC:一个可扩展的低延迟垃圾回收器
+ *          继java11引入的垃圾回收器，经过多次试验，自此终于成为正式特性，支持Linux MacOS Windows
+ *          非默认，默认是：G1，现在只需要-XX:+UseZGC即可
  *      文本快
+ *          jdk13引入文本块text-block,现在已经转正
  *      Shenandoah:地暂停时间垃圾收集器
+ *          与ZGC类似，转正了，目前只存在于OpenJDK中
  *      移除Solaris和SPARC端口
+ *          主要原因是近年来Solaris和SPARC操作系统已经被Linux操作系统和英特尔处理器所取代，放弃对Solaris和SPARC端口的支持将使OpenJDK社区的贡献者能加速开啊新功能，推动平台向前发展
  *      外部存储访问API(第二次孵化版本)
+ *          目的是引入一个api,以允许java程序安全有效的访问java堆之外的外部存储器，如本机，持久和托管堆，有许多java程序是访问外部内存的，比如Ignite和MapDB，该API将有助于
+ *          避免与垃圾收集器相关的成本以及与开进程共享内存以及通过将文件映射到内存来序列化和反序列化内存内容相关的不可预测性：Foreign-Memory-Access API
  *      Records(第二次预览)
+ *          不能声明为abstract
+ *          不可以显示继承其他类
  *      废弃RMI激活机制
+ *          远程方法调用的激活机制是RMI中一个过时的部分，RMI的其他部分暂时不会被弃用，在rmi系统中我们使用延迟激活，将激活对象推迟到客户第一次使用（即第一次方法调用）之前，
+ *          既然rmi激活机制这么好用，为什么要移除呢？
+ *              因为对于现代应用程序来说，分布式系统大部分都是基于web的，web服务器已经解决了穿越防火墙、过滤请求、身份验证和安全性的问题，并且也提供了很多延迟加载的技术，所以
+ *              现代程序应用中，RMI Activation已经很少被用到了 ，jdk8中可选，jdk15废弃
+ *      给CharSequence接口新增了isEmpty默认方法
+ *          default boolean isEmpty(){return this.length()==0}
+ *      对TreeMap提供了putIfAbsent,computeIfAbsent,computeIfPresent,compute,merge方法提供了overriding实现
  * 总结：
  *      jdk15整体看来新特性方面并不是算很亮眼，它主要是对之前版本预览特性功能做了确定，如文本块 ZGC,这样一来就可以放心大胆的使用了
  *      你发任你发，我用java8
